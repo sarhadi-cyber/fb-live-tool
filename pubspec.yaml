@@ -1,0 +1,40 @@
+name: fb_live_tool
+description: "FB Live Tool - Facebook Live only, video file + watermark (V1)."
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+  flutter: ">=3.24.0"
+
+# ffmpeg_kit_extended needs the full bundle + GPL for libx264.
+# WARNING: enabling GPL makes this build GPL-licensed. This is fine for
+# personal sideload use; read the ffmpeg-kit docs before Play Store publishing.
+# v1.0.0 prefers hooks.user_defines; legacy config kept as fallback.
+hooks:
+  user_defines:
+    ffmpeg_kit_extended_flutter:
+      type: "full"
+      gpl: true
+      small: false
+ffmpeg_kit_extended_config:
+  type: "full"
+  gpl: true
+  small: false
+
+dependencies:
+  flutter:
+    sdk: flutter
+  ffmpeg_kit_extended_flutter: ^1.0.0
+  image_picker: ^1.1.2
+  path_provider: ^2.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/watermark.png
