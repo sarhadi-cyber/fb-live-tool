@@ -1,0 +1,64 @@
+name: Build FB Live APK
+
+# Run it by hand from the Actions tab (workflow_dispatch), or on every push.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Flutter 3.47.0
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.0"
+          channel: stable
+          cache: true
+
+      - name: Create Flutter project skeleton
+        # This generates android/, ios/, etc. so you only need to upload
+        # lib/, pubspec.yaml, assets/ and tools/ from your phone.
+        # Our files are moved aside first, so flutter create cannot overwrite them.
+        run: |
+          mkdir -p /tmp/ourfiles
+          cp -r lib pubspec.yaml assets tools /tmp/ourfiles/
+          flutter create . --project-name fb_live_tool --org com.naseemdigital.fblive --platforms android
+          cp -r /tmp/ourfiles/lib /tmp/ourfiles/pubspec.yaml /tmp/ourfiles/assets /tmp/ourfiles/tools ./
+          ls -l lib/main.dart pubspec.yaml assets/watermark.png.b64 tools/patch_manifest.py
+
+      - name: Patch Android manifest + minSdk 26
+        run: python3 tools/patch_manifest.py
+
+      - name: Restore watermark PNG from base64
+        # PNG cannot be pushed via the MCP text-only push, so it is stored
+        # as base64 text and decoded here before the build. This restores
+        # the exact AlifYa icon bytes.
+        run: |
+          base64 -d assets/watermark.png.b64 > assets/watermark.png
+          ls -lh assets/watermark.png
+          file assets/watermark.png
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build debug APK (no signing needed for personal install)
+        run: flutter build apk --debug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: fb-live-tool-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 30
