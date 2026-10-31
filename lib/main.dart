@@ -175,7 +175,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _stop() async {
-    await FFmpegKitExtended.cancelAllSessions();
+    // cancelAllSessions() returns void in ffmpeg_kit_extended 1.0.0 - must NOT be awaited (was the sole Actions build error, main.dart:178).
+    FFmpegKitExtended.cancelAllSessions();
     if (mounted) {
       setState(() {
         _running = false;
