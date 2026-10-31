@@ -1,7 +1,7 @@
 name: fb_live_tool
-description: "FB Live Tool - Facebook Live only, video file + watermark (V1)."
+description: "FB Live Tool - Facebook Live only, page + link + watermark + copyright (V2)."
 publish_to: "none"
-version: 1.0.0+1
+version: 1.1.0+2
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
@@ -28,6 +28,8 @@ dependencies:
   ffmpeg_kit_extended_flutter: ^1.0.0
   image_picker: ^1.1.2
   path_provider: ^2.1.0
+  http: ^1.2.0
+  youtube_explode_dart: ^2.5.0
 
 dev_dependencies:
   flutter_test:
